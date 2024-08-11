@@ -69,6 +69,10 @@ module Prawn
   #   numbering (for styling and other row-specific options) always indexes
   #   based on your data array. Whether or not you have a header, row(n) always
   #   refers to the nth element (starting from 0) of the +data+ array.
+  # +headers+::
+  #   If set to a multidimensional array of data, the defined header will be
+  #   repeated on every page.
+  #   +header+ must also be set to +true+ for this to function.
   # +column_widths+::
   #   Sets widths for individual columns. Manually setting widths can give
   #   better results than letting Prawn guess at them, as Prawn's algorithm
@@ -234,6 +238,10 @@ module Prawn
     #
     attr_writer :header
 
+    # If set to a valid multidimensional array of data the data specified here
+    # will be used on each page as the header. +header+ must be set to +true+
+    # for this to function.
+    #
     attr_accessor :headers
 
     # Accepts an Array of alternating row colors to stripe the table.
