@@ -311,10 +311,6 @@ module Prawn
         # page is finished.
         cells_this_page = []
 
-        if !@headers.nil? && @header && @pdf.page_count == 1
-          add_header(@pdf.cursor, cells_this_page)
-        end
-
         @cells.each do |cell|
           if start_new_page?(cell, offset, ref_bounds)
             # draw cells on the current page and then start a new one
