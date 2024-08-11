@@ -1153,6 +1153,17 @@ describe "Prawn::Table" do
           data.flatten[-2..-1]
       end
 
+      it "should repeat defined headers across pages" do
+        data = [["foo","bar"]] * 31
+        headers = [["baz","foobar"]]
+        @pdf = Prawn::Document.new
+        @pdf.table(data, :header => true, :headers => headers)
+        output = PDF::Inspector::Text.analyze(@pdf.render)
+        expect(@pdf.page_count).to eq 2
+        expect(output.strings).to eq headers.flatten + data.flatten[0..-3] + headers.flatten +
+                                       data.flatten[-2..-1]
+      end
+
       it "draws headers at the correct position" do
         data = [["header"]] + [["foo"]] * 40
 

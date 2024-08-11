@@ -142,8 +142,13 @@ module Prawn
       @pdf = document
       @cells = make_cells(data, table_opts.delete(:cell_style) || {})
       @header = false
+      @headers = nil
       table_opts.each do |k, v|
         send("#{k}=", v) if respond_to?("#{k}=")
+      end
+
+      unless @headers.nil?
+        @headers = make_cells(@headers, table_opts.delete(:cell_style) || {})
       end
 
       if block
@@ -229,6 +234,8 @@ module Prawn
     #
     attr_writer :header
 
+    attr_accessor :headers
+
     # Accepts an Array of alternating row colors to stripe the table.
     #
     attr_writer :row_colors
@@ -295,6 +302,10 @@ module Prawn
         # Track cells to be drawn on this page. They will all be drawn when this
         # page is finished.
         cells_this_page = []
+
+        if !@headers.nil? && @header && @pdf.page_count == 1
+          add_header(@pdf.cursor, cells_this_page)
+        end
 
         @cells.each do |cell|
           if start_new_page?(cell, offset, ref_bounds)
@@ -506,7 +517,11 @@ module Prawn
     def header_rows
       header_rows = Cells.new
       number_of_header_rows.times do |r|
-        row(r).each { |cell| header_rows[cell.row, cell.column] = cell.dup }
+        if @headers.nil?
+          row(r).each { |cell| header_rows[cell.row, cell.column] = cell.dup }
+        else
+          headers.row(r).each { |cell| header_rows[cell.row, cell.column] = cell.dup }
+        end
       end
       header_rows
     end
@@ -673,13 +688,19 @@ module Prawn
       # Calculate x- and y-positions as running sums of widths / heights.
       x_positions = column_widths.inject([0]) { |ary, x|
         ary << (ary.last + x); ary }[0..-2]
-      x_positions.each_with_index { |x, i| column(i).x = x }
+      x_positions.each_with_index do |x, i|
+        column(i).x = x
+        headers.column(i).x = x unless headers.nil? || headers.column(i).nil?
+      end
 
       # y-positions assume an infinitely long canvas starting at zero -- this
       # is corrected for in Table#draw, and page breaks are properly inserted.
       y_positions = row_heights.inject([0]) { |ary, y|
         ary << (ary.last - y); ary}[0..-2]
-      y_positions.each_with_index { |y, i| row(i).y = y }
+      y_positions.each_with_index do |y, i|
+        row(i).y = y
+        headers.row(i).y = y unless headers.nil? || headers.row(i).nil?
+      end
     end
 
     # Sets up a bounding box to position the table according to the specified
