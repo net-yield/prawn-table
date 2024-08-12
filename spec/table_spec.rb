@@ -1154,13 +1154,14 @@ describe "Prawn::Table" do
       end
 
       it "should repeat defined headers across pages" do
-        data = [["foo","bar"]] * 31
-        headers = [["baz","foobar"]]
+        data = [["foo","bar"]] * 30
+        first_page_headers = [["bazbar", "foobaz"]]
+        repeating_headers = [["baz","foobar"]]
         @pdf = Prawn::Document.new
-        @pdf.table(data, :header => true, :headers => headers)
+        @pdf.table(first_page_headers + data, :header => true, :headers => repeating_headers)
         output = PDF::Inspector::Text.analyze(@pdf.render)
         expect(@pdf.page_count).to eq 2
-        expect(output.strings).to eq headers.flatten + data.flatten[0..-3] + headers.flatten +
+        expect(output.strings).to eq first_page_headers.flatten + data.flatten[0..-3] + repeating_headers.flatten +
                                        data.flatten[-2..-1]
       end
 
