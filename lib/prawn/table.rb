@@ -675,6 +675,10 @@ module Prawn
     def set_column_widths
       column_widths.each_with_index do |w, col_num|
         column(col_num).width = w
+        headers.column(col_num).width = w if !headers.nil? && !headers.column(col_num).nil?
+      end
+      if !headers.nil?
+        headers.column(col_num).width = w
       end
     end
 
@@ -682,7 +686,10 @@ module Prawn
     # row is the same height.
     #
     def set_row_heights
-      row_heights.each_with_index { |h, row_num| row(row_num).height = h }
+      row_heights.each_with_index do |h, row_num|
+        row(row_num).height = h
+        headers.row(row_num).height = h if !headers.nil? && !headers.row(row_num).nil?
+      end
     end
 
     # Set each cell's position based on the widths and heights of cells
