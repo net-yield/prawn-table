@@ -677,9 +677,6 @@ module Prawn
         column(col_num).width = w
         headers.column(col_num).width = w if !headers.nil? && !headers.column(col_num).nil?
       end
-      if !headers.nil?
-        headers.column(col_num).width = w
-      end
     end
 
     # Assigns the row heights to each cell. This ensures that every cell in a
